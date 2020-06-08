@@ -26,29 +26,29 @@ class StreamToClassifier(StreamListener):
                 tweet = data_["retweeted_status"]["text"]
         else:
             tweet = data_["text"]
-        #print(tweet)
+        print(tweet)
         tweet = process_tweet(tweet)
         #print("----------")
         #print(tweet)
         analysis = get_tweet_sentiment(tweet)
         polarity = analysis.sentiment.polarity
-        if polarity != 0:
-            polarities.append(polarity)
         if polarity > 0:
             sentiment = "positive"
+            polarities.append(1)
         elif polarity == 0:
             sentiment = "neutral"
         elif polarity < 0:
             sentiment = "negative"
+            polarities.append(-1)
         subjectivity = analysis.sentiment.subjectivity
         #print("polarity:", polarity, sentiment)
         #print("subjectivity:", analysis.sentiment.subjectivity)
-        #print("--------------------------------------")
-        restart_line()
-        if not len(polarities):
-            return True
-        sys.stdout.write("average polarity:" + str(sum(polarities)/len(polarities)))
-        sys.stdout.flush()
+        print("--------------------------------------")
+        # restart_line()
+        # if not len(polarities):
+        #     return True
+        # sys.stdout.write("average polarity:" + str(sum(polarities)/len(polarities)))
+        # sys.stdout.flush()
         return True
 
     def on_error(self, status):
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     auth.set_access_token(keys.ACCESS_TOKEN, keys.ACCESS_TOKEN_SECRET)
     stream = Stream(auth, listener)
     keywords = [
-        "Donald Trump"
+        "Joe Biden"
     ]
     polarities = []
     stream.filter(track=keywords)

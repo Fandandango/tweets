@@ -1,4 +1,6 @@
 import sys
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
@@ -7,6 +9,7 @@ import auth_keys as keys
 import json
 import time
 import re
+from profanity_check import predict, predict_prob
 
 """
 USEFUL KEYS
@@ -34,6 +37,7 @@ class StdOutListener(StreamListener):
         if "extended_tweet" in data_:
             tweet = data_["extended_tweet"]["full_text"]
         elif "retweeted_status" in data_:
+            return
             if "extended_tweet" in data_["retweeted_status"]:
                 tweet = data_["retweeted_status"]["extended_tweet"]["full_text"]
             else:
@@ -45,6 +49,7 @@ class StdOutListener(StreamListener):
             tweet = data_["text"]
 
         if "quoted_status" in data_:
+            return
             if "extended_tweet" in data_["quoted_status"]:
                 quote = data_["quoted_status"]["extended_tweet"]["full_text"]
             else:
@@ -54,12 +59,13 @@ class StdOutListener(StreamListener):
             tweet = tweet + f"\nQuoting {q_name} (@{q_handle})" + quote
 
         authors += ":"
-        print(authors)
-        print(tweet)
-        print("-----------------------------------")
-        file.write(authors + "\n")
-        file.write(tweet + "\n\n")
-        time.sleep(1)
+        if predict([self.clean_tweet(tweet)])[0]:
+            print(authors)
+            print(tweet)
+            print("-----------------------------------")
+            file.write(authors + "\n")
+            file.write(tweet + "\n")
+            file.write("----------------------------------------------------\n")
         return True
 
     def on_error(self, status):
@@ -80,22 +86,22 @@ if __name__ == "__main__":
     keywords = [
         "Donald Trump"
     ]
-    # with open('tweets_test.txt', 'w', encoding='utf-8') as file:
-    #     stream.filter(track=keywords)
+    with open('tweets_test.txt', 'w', encoding='utf-8') as file:
+        stream.filter(track=keywords)
 
     #print(api.get_status("125657359841361920"))
     # the_d = api.get_user("realDonaldTrump")
-    the_d = api.user_timeline("25073877", tweet_mode="extended")
-    for item in the_d:
-        if "retweeted_status" in item._json:
-            if "extended_tweet" in item._json["retweeted_status"]:
-                tweet = item._json["retweeted_status"]["extended_tweet"]["full_text"]
-            else:
-                tweet = item._json["retweeted_status"]["full_text"]
-        else:
-            tweet = item._json["full_text"]
-        print(tweet)
-        print("------------------------------------------")
+    # the_d = api.user_timeline("25073877", tweet_mode="extended")
+    # for item in the_d:
+    #     if "retweeted_status" in item._json:
+    #         if "extended_tweet" in item._json["retweeted_status"]:
+    #             tweet = item._json["retweeted_status"]["extended_tweet"]["full_text"]
+    #         else:
+    #             tweet = item._json["retweeted_status"]["full_text"]
+    #     else:
+    #         tweet = item._json["full_text"]
+    #     print(tweet)
+    #     print("------------------------------------------")
     #print(api.search("donald trump"))
 
     # print(api.trends_available())
