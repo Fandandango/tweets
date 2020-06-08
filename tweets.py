@@ -59,7 +59,7 @@ class StdOutListener(StreamListener):
         print("-----------------------------------")
         file.write(authors + "\n")
         file.write(tweet + "\n\n")
-
+        time.sleep(1)
         return True
 
     def on_error(self, status):
@@ -83,27 +83,27 @@ if __name__ == "__main__":
     # with open('tweets_test.txt', 'w', encoding='utf-8') as file:
     #     stream.filter(track=keywords)
 
+    #print(api.get_status("125657359841361920"))
     # the_d = api.get_user("realDonaldTrump")
-    # the_d = api.user_timeline("25073877", tweet_mode="extended")
-    # for item in the_d:
-    #     if "retweeted_status" in item._json:
-    #         if "extended_tweet" in item._json["retweeted_status"]:
-    #             tweet = item._json["retweeted_status"]["extended_tweet"]["full_text"]
-    #         else:
-    #             tweet = item._json["retweeted_status"]["full_text"]
-    #     else:
-    #         tweet = item._json["full_text"]
-    #     print(tweet)
-    #     print("------------------------------------------")
-    #print(api.rate_limit_status())
+    the_d = api.user_timeline("25073877", tweet_mode="extended")
+    for item in the_d:
+        if "retweeted_status" in item._json:
+            if "extended_tweet" in item._json["retweeted_status"]:
+                tweet = item._json["retweeted_status"]["extended_tweet"]["full_text"]
+            else:
+                tweet = item._json["retweeted_status"]["full_text"]
+        else:
+            tweet = item._json["full_text"]
+        print(tweet)
+        print("------------------------------------------")
     #print(api.search("donald trump"))
 
-    print(api.trends_available())
-    with open('trending.txt', 'w', encoding='utf-8') as file:
-        # 1 : worldwide
-        # 23424975 : UK
-        # 26062 : Leicester
-        # 26734 : Liverpool
-        for item in api.trends_place(26062)[0]["trends"]:   # arg is a Yahoo! Where On Earth ID
-            print(item['name'], ":", item['tweet_volume'])
-            file.write(item['name'] + " : " + str(item['tweet_volume']) + "\n")
+    # print(api.trends_available())
+    # with open('trending.txt', 'w', encoding='utf-8') as file:
+    #     # 1 : worldwide
+    #     # 23424975 : UK
+    #     # 26062 : Leicester
+    #     # 26734 : Liverpool
+    #     for item in api.trends_place(23424975)[0]["trends"]:   # arg is a Yahoo! Where On Earth ID
+    #         print(item['name'], ":", item['tweet_volume'])
+    #         file.write(item['name'] + " : " + str(item['tweet_volume']) + "\n")
