@@ -26,14 +26,11 @@ class StdOutListener(StreamListener):
     def clean_tweet(self, tweet):
         return ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", tweet).split())
 
-
     def on_data(self, data):
         data_ = json.loads(data)
-        display_data(data_)
         name = data_["user"]["name"]
         handle = data_["user"]["screen_name"]
         authors = f"{name} (@{handle})"
-
         if "extended_tweet" in data_:
             tweet = data_["extended_tweet"]["full_text"]
         elif "retweeted_status" in data_:
@@ -58,10 +55,11 @@ class StdOutListener(StreamListener):
 
         authors += ":"
         print(authors)
-        print(self.clean_tweet(tweet))
+        print(tweet)
         print("-----------------------------------")
-        time.sleep(1)
-        sys.exit()
+        file.write(authors + "\n")
+        file.write(tweet + "\n\n")
+
         return True
 
     def on_error(self, status):
@@ -73,27 +71,39 @@ class StdOutListener(StreamListener):
 
 if __name__ == "__main__":
 
-    # listener = StdOutListener()
+    listener = StdOutListener()
     auth = OAuthHandler(keys.CONSUMER_API_KEY, keys.CONSUMER_API_SECRET_KEY)
     auth.set_access_token(keys.ACCESS_TOKEN, keys.ACCESS_TOKEN_SECRET)
-    #
-    # stream = Stream(auth, listener)
-    #
-    # keywords = [
-    #     "COVID19"
-    # ]
-    # stream.filter(track=keywords)
-
     api = API(auth_handler=auth)
-    #the_d = api.get_user("realDonaldTrump")
-    the_d = api.user_timeline("25073877", tweet_mode="extended")
-    for item in the_d:
-        if "retweeted_status" in item._json:
-            if "extended_tweet" in item._json["retweeted_status"]:
-                tweet = item._json["retweeted_status"]["extended_tweet"]["full_text"]
-            else:
-                tweet = item._json["retweeted_status"]["full_text"]
-        else:
-            tweet = item._json["full_text"]
-        print(tweet)
-        print("------------------------------------------")
+    stream = Stream(auth, listener)
+
+    keywords = [
+        "Donald Trump"
+    ]
+    # with open('tweets_test.txt', 'w', encoding='utf-8') as file:
+    #     stream.filter(track=keywords)
+
+    # the_d = api.get_user("realDonaldTrump")
+    # the_d = api.user_timeline("25073877", tweet_mode="extended")
+    # for item in the_d:
+    #     if "retweeted_status" in item._json:
+    #         if "extended_tweet" in item._json["retweeted_status"]:
+    #             tweet = item._json["retweeted_status"]["extended_tweet"]["full_text"]
+    #         else:
+    #             tweet = item._json["retweeted_status"]["full_text"]
+    #     else:
+    #         tweet = item._json["full_text"]
+    #     print(tweet)
+    #     print("------------------------------------------")
+    #print(api.rate_limit_status())
+    #print(api.search("donald trump"))
+
+    print(api.trends_available())
+    with open('trending.txt', 'w', encoding='utf-8') as file:
+        # 1 : worldwide
+        # 23424975 : UK
+        # 26062 : Leicester
+        # 26734 : Liverpool
+        for item in api.trends_place(26062)[0]["trends"]:   # arg is a Yahoo! Where On Earth ID
+            print(item['name'], ":", item['tweet_volume'])
+            file.write(item['name'] + " : " + str(item['tweet_volume']) + "\n")
