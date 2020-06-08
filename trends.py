@@ -1,6 +1,7 @@
 from pytrends.request import TrendReq
 import spacy
 
+
 pytrends = TrendReq()
 z = pytrends.trending_searches(pn='united_kingdom')
 nlp = spacy.load("en_core_web_sm")
