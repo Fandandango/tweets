@@ -9,6 +9,8 @@ import auth_keys as keys
 import json
 import time
 import re
+import warnings
+warnings.filterwarnings('ignore')
 from profanity_check import predict, predict_prob
 
 """
@@ -63,9 +65,10 @@ class StdOutListener(StreamListener):
             print(authors)
             print(tweet)
             print("-----------------------------------")
-            file.write(authors + "\n")
-            file.write(tweet + "\n")
-            file.write("----------------------------------------------------\n")
+            with open('tweets_test.txt', 'a', encoding='utf-8') as file:
+                file.write(authors + "\n")
+                file.write(tweet + "\n")
+                file.write("----------------------------------------------------\n")
         return True
 
     def on_error(self, status):
@@ -77,17 +80,23 @@ class StdOutListener(StreamListener):
 
 if __name__ == "__main__":
 
-    listener = StdOutListener()
-    auth = OAuthHandler(keys.CONSUMER_API_KEY, keys.CONSUMER_API_SECRET_KEY)
-    auth.set_access_token(keys.ACCESS_TOKEN, keys.ACCESS_TOKEN_SECRET)
-    api = API(auth_handler=auth)
-    stream = Stream(auth, listener)
-
     keywords = [
         "Donald Trump"
     ]
-    with open('tweets_test.txt', 'w', encoding='utf-8') as file:
-        stream.filter(track=keywords)
+
+    while True:
+        listener = StdOutListener()
+        auth = OAuthHandler(keys.CONSUMER_API_KEY, keys.CONSUMER_API_SECRET_KEY)
+        auth.set_access_token(keys.ACCESS_TOKEN, keys.ACCESS_TOKEN_SECRET)
+        api = API(auth_handler=auth)
+        stream = Stream(auth, listener)
+        try:
+            stream.filter(track=keywords)
+        except Exception as e:
+            with open('err_log.txt', 'a') as f:
+                f.write("error occured @ " + time.ctime() + "\n")
+                f.write(str(e) + "\n")
+            continue
 
     #print(api.get_status("125657359841361920"))
     # the_d = api.get_user("realDonaldTrump")
