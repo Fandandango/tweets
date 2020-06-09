@@ -1,0 +1,2 @@
+error occured @ Tue Jun  9 03:27:10 2020
+("Connection broken: ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None)", ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))

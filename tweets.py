@@ -27,6 +27,20 @@ def display_data(data):
     for key in data:
         print(key, ":", data[key])
 
+def add_break_lines(txt, chars_per_line):
+    newtxt = ""
+    last_newline = 0
+    for char in txt:
+        if char == '\n':
+            last_newline = 0
+        else:
+            last_newline += 1
+        newtxt += char
+        if last_newline == chars_per_line:
+            newtxt += '\n'
+            last_newline = 0
+    return newtxt
+
 class StdOutListener(StreamListener):
     def clean_tweet(self, tweet):
         return ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", tweet).split())
@@ -67,7 +81,7 @@ class StdOutListener(StreamListener):
             print("-----------------------------------")
             with open('tweets_test.txt', 'a', encoding='utf-8') as file:
                 file.write(authors + "\n")
-                file.write(tweet + "\n")
+                file.write(add_break_lines(tweet, 100) + "\n")
                 file.write("----------------------------------------------------\n")
         return True
 
