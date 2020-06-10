@@ -30,13 +30,10 @@ def display_data(data):
 def add_break_lines(txt, chars_per_line):
     newtxt = ""
     last_newline = 0
-    for char in txt:
-        if char == '\n':
-            last_newline = 0
-        else:
-            last_newline += 1
-        newtxt += char
-        if last_newline == chars_per_line:
+    for word in txt.split():
+        newtxt += word + " "
+        last_newline += len(word)
+        if last_newline >= chars_per_line:
             newtxt += '\n'
             last_newline = 0
     return newtxt
@@ -81,7 +78,7 @@ class StdOutListener(StreamListener):
             print("-----------------------------------")
             with open('tweets_test.txt', 'a', encoding='utf-8') as file:
                 file.write(authors + "\n")
-                file.write(add_break_lines(tweet, 100) + "\n")
+                file.write(add_break_lines(tweet, 80) + "\n")
                 file.write("----------------------------------------------------\n")
         return True
 
